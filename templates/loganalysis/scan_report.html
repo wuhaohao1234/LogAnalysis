@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    {% include 'common/header_inc.html' %}
+
+    <link rel="stylesheet" href="{{{ url_for('static', filename='json2html/css/modern-normalize.css') }}}"
+          type="text/css">
+    <link rel="stylesheet" href="{{{ url_for('static', filename='json2html/css/style.css') }}}" type="text/css">
+    <link rel="stylesheet" href="{{{ url_for('static', filename='json2html/css/modal.css') }}}" type="text/css">
+
+    <script src="{{{ url_for('static', filename='json2html/js/util.js') }}}"></script>
+    <script src="{{{ url_for('static', filename='json2html/js/extended-types.js') }}}"></script>
+    <script src="{{{ url_for('static', filename='json2html/js/tree.js') }}}"></script>
+    <script src="{{{ url_for('static', filename='json2html/js/render.js') }}}"></script>
+    <script src="{{{ url_for('static', filename='json2html/js/modal.js') }}}"></script>
+    <script src="{{{ url_for('static', filename='json2html/js/statistics.js') }}}"></script>
+    <script src="{{{ url_for('static', filename='json2html/js/parse.js') }}}"></script>
+    <script src="{{{ url_for('static', filename='json2html/js/output.js') }}}"></script>
+
+    <style>
+        .object {
+            background-color: powderblue !important;
+        }
+
+        #focus {
+            box-shadow: none !important;
+        }
+
+        #output {
+            padding: 16px 0;
+        }
+
+        .layui-form {
+            width: 100% !important;
+        }
+    </style>
+</head>
+<body>
+<div class="layui-container">
+    {% include 'common/header_site.html' %}
+    <div class="layui-row layui-font-30" style="text-align: center; padding: 20px 0;">任务报告</div>
+    <div class="layui-row"><a href="/download_report?id={{{ task_id }}}" style="float: right; margin: 10px 20px;">下载报告</a></div>
+    <div class="layui-row">
+        <div class="layui-table" id="done-list"></div>
+    </div>
+    <div id="output"></div>
+
+    <div id="focus">
+        <div id="focus-output">
+            <div>
+                <label>Property path:</label> <code id="focus-path"></code>
+            </div>
+            <div>
+                <label>Trail:</label> <span id="focus-trail"></span>
+            </div>
+            <div>
+                <label>Type:</label> <span id="focus-type"></span><span id="focus-extended-type"></span>
+            </div>
+        </div>
+    </div>
+
+    <div id="help-content">
+        <p>
+            <span class="string">Colour for text and null values.</span><br>
+            <span class="number">Colour for numbers.</span><br>
+            <span class="boolean">Colour for true and false values.</span><br>
+            <span class="void">Colour for void values.</span><br>
+            <img class="ex" src="{{{ url_for('static', filename='json2html/images/object.png') }}}"/>
+            Background for Objects.<br>
+            <img class="ex" src="{{{ url_for('static', filename='json2html/images/array.png') }}}"/>
+            Background for Arrays.<br>
+            <img class="ex" src="{{{ url_for('static', filename='json2html/images/objectt.png') }}}"/>
+            Background for Object name/value pair tables.<br>
+            <img class="ex" src="{{{ url_for('static', filename='json2html/images/arrayt.png') }}}"/>
+            Background for Array value tables.</p>
+        <h3>Note</h3>
+        <p>
+            Individual 'words' that are extremely long may be broken into two or more lines to conserve horizontal
+            space.
+        </p>
+    </div>
+
+
+    {% include 'common/footer.html' %}
+</div>
+</div>
+<script>
+    layui.use(['table'], function () {
+        let table = layui.table;
+        table.render({
+            elem: '#done-list',
+            url: '/newdone/task_list?id={{{ task_id }}}',
+            method: 'get',
+            skin: 'line',
+            scrollX: true,
+//            page: {
+//                limit: 10
+//                , limits: [10, 30, 50, 100]
+//                , layout: ['count', 'first', 'prev', 'page', 'next', 'last', 'limit']
+//                , groups: 10
+//            },
+            cols: [[ //表头
+                , {field: 'id', title: 'ID', hide: true},
+                , {field: 'username', title: '用户名'}
+                , {field: 'hosts', title: '扫描 IP'}
+                , {field: 'ports', title: '扫描端口'}
+                , {field: 'arguments', title: '参数'}
+                , {field: 'cmd_line', title: '命令行'}
+                , {field: 'task_status', title: '状态'}
+                , {field: 'create_at', title: '创建时间'}
+                , {field: 'update_at', title: '完成时间'}
+            ]]
+        })
+    })
+    getURL('/get_report?id={{{ task_id }}}')
+</script>
+</body>
+</html>

@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    {% include 'common/header_inc.html' %}
+    <style>
+        .layui-form {
+            width: 100% !important;
+        }
+        .contact .layui-row {
+            margin: 20px 0;
+        }
+    </style>
+</head>
+<body>
+<div class="layui-container layui-bg-gray">
+    {% include 'common/header_site.html' %}
+    {% include 'loganalysis/nav.html' %}
+    <div class="layui-row layui-font-18" style="text-align: center;">
+        <div class="layui-col-md2">&nbsp;</div>
+        <div class="layui-col-md8">
+            <div class="layui-row layui-padding-3">
+                <div class="layui-col-md12">
+                    <h1>关 于 我 们</h1>
+                </div>
+            </div>
+            <div class="layui-row" style="line-height: 28px;">
+                <div class="layui-col-md12" style="text-align: left">
+                    <p style="text-indent: 2em;">{{{ site_info.description }}}</p>
+                </div>
+            </div>
+            <div class="layui-row contact" style="text-align: left">
+                <div class="layui-row">
+                    <div class="layui-col-md12">
+                        <p style="text-indent: 2em;">网址：<a href="{{{ site_info.url }}}" target="_blank">{{{ site_info.url }}}</a></p>
+                    </div>
+                </div>
+                <div class="layui-row">
+                    <div class="layui-col-md12">
+                        <p style="text-indent: 2em;">电话：<a href="tel://{{{ site_info.tel }}}">{{{ site_info.tel }}}</a>
+                        </p>
+                    </div>
+                </div>
+                <div class="layui-row">
+                    <div class="layui-col-md12">
+                        <p style="text-indent: 2em;">管理员邮箱：<a
+                                href="mailto://{{{ site_info.email }}}">{{{ site_info.email }}}</a></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="layui-col-md2"></div>
+    </div>
+    {% include 'common/footer.html' %}
+</div>
+<script>
+    layui.use('jquery', function () {
+        let $ = layui.jquery
+        $('#about').addClass('layui-this')
+    })
+</script>
+</body>
+</html>

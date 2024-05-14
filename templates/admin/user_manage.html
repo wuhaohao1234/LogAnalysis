@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    {% include 'common/header_inc.html' %}
+    <style>
+        .layui-form {
+            width: 100% !important;
+        }
+    </style>
+</head>
+<body>
+<div class="layui-container">
+    {% include 'common/header_site.html' %}
+    <div class="layui-row">
+        <div class="layui-col-md2">
+            {% include 'admin/nav.html' %}
+        </div>
+        <div class="layui-col-md10">
+            <table class="layui-table" id="user-list" style="width: auto;">
+            </table>
+        </div>
+    </div>
+    <script type="text/html" id="checkboxTpl1">
+        <!-- 这里的 checked 的状态只是演示 -->
+        <input type="checkbox" name="role" value="{{ d.id }}" title="管理员"
+               lay-filter="adminBar" {{ d.role== '管理员' ? 'checked' : '' }}>
+    </script>
+
+    <script type="text/html" id="checkboxTpl2">
+        <!-- 这里的 checked 的状态只是演示 -->
+        <input type="checkbox" name="enable" value="{{ d.id }}" title="锁定" lay-filter="lockBar"
+               {{ d.enable !=1 ? 'checked' : '' }}>
+    </script>
+    {% include 'common/footer.html' %}
+</div>
+<script>
+    selectMineNav(1, 0, 'admin-nav');
+</script>
+<script>
+    layui.use(['table', 'form', 'popup', 'jquery'], function () {
+        let table = layui.table
+        let form = layui.form
+        let confirm = layui.confirm
+        let popup = layui.popup
+        let $ = layui.jquery
+        table.render({
+            elem: '#user-list',
+            url: '/admin/user/list',
+            method: 'get',
+            scrollX: true,
+//            page: {
+//                limit: 10
+//                , limits: [10, 30, 50, 100]
+//                , layout: ['count', 'first', 'prev', 'page', 'next', 'last', 'limit']
+//                , groups: 10
+//            },
+            cols: [[ //表头
+                {field: 'id', title: 'ID', fixed: 'left'}
+                , {field: 'username', title: '用户名'}
+                , {field: 'nickname', title: '昵称'}
+                , {field: 'phone', title: '手机号'}
+                , {field: 'email', title: '邮箱'}
+                , {field: 'role', title: '角色', hide: true}
+                , {field: 'create_at', title: '创建时间'}
+                , {field: 'role', title: '角色', width: 130, templet: '#checkboxTpl1', unresize: true}
+                , {field: 'enable', title: '锁定', width: 110, templet: '#checkboxTpl2', unresize: true}
+            ]]
+        })
+        //监听权限操作
+        form.on('checkbox(adminBar)', function (obj) {
+            let c = obj.othis[0]
+
+            let id = this.value
+            let opt = 'no'
+            let msg = '是否取消此用户的管理员权限'
+            if (obj.elem.checked) {
+                opt = 'yes'
+                msg = '是否为此用户置管理员权限'
+            }
+            layer.confirm(msg, function (index) {
+                layer.close(index);
+                $.ajax({
+                    url: '/admin/user/set_admin?id=' + id + '&opt=' + opt,
+                    type: "get",
+                    dataType: 'json',
+                    success: function (result) {
+                        if (result.success) {
+                            popup.success(result.msg, function () {
+                                location.href = "{{{ url_for('admin.user.user_manage') }}}";
+                            })
+                        }
+                    }
+                });
+            }, function (index) {
+                if (obj.elem.checked) {
+                    c.classList.remove('layui-form-checked')
+                    obj.elem.checked = false
+                } else {
+                    c.classList.add('layui-form-checked')
+                    obj.elem.checked = true
+                }
+                layer.close(index);
+            })
+        });
+
+        //监听锁定操作
+        form.on('checkbox(lockBar)', function (obj) {
+            let c = obj.othis[0]
+
+            let id = this.value
+            let opt = 'active'
+            let msg = '是否启用此用户的登录权限'
+            if (obj.elem.checked) {
+                opt = 'lock'
+                msg = '是否禁用此用户的登录权限'
+            }
+
+            layer.confirm(msg, function (index) {
+                console.log(index, this.value)
+                layer.close(index);
+                $.ajax({
+                    url: '/admin/user/set_active?id=' + id + '&opt=' + opt,
+                    type: "get",
+                    dataType: 'json',
+                    success: function (result) {
+                        if (result.success) {
+                            popup.success(result.msg, function () {
+                                location.href = "{{{ url_for('admin.user.user_manage') }}}";
+                            })
+                        }
+                    }
+                });
+            }, function (index) {
+                if (obj.elem.checked) {
+                    c.classList.remove('layui-form-checked')
+                    obj.elem.checked = false
+                } else {
+                    c.classList.add('layui-form-checked')
+                    obj.elem.checked = true
+                }
+                layer.close(index);
+            })
+        });
+
+        $('#data-manage').addClass('layui-nav-itemed')
+        $('#user-manage').addClass('layui-this')
+    })
+</script>
+</body>
+</html>

@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    {% include 'common/header_inc.html' %}
+    <style>
+        .layui-form {
+            width: 100% !important;
+        }
+    </style>
+</head>
+<body>
+<div class="layui-container layui-bg-gray">
+    {% include 'common/header_site.html' %}
+    {% include 'loganalysis/nav.html' %}
+    <div class="layui-row">
+        <div class="layui-col-md2">
+            {% include 'loganalysis/mine_nav.html' %}
+        </div>
+        <div class="layui-col-md10">
+            <table class="layui-table" id="message-list" lay-filter="m-list" style="width: auto;">
+            </table>
+        </div>
+    </div>
+    <script type="text/html" id="deleteBar">
+        <a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="del">删除</a>
+    </script>
+    {% include 'common/footer.html' %}
+</div>
+<script>
+    selectHomeNav('mine');
+    selectMineNav(1, 1);
+</script>
+<script>
+    layui.use(['table', 'popup', 'jquery'], function () {
+        let table = layui.table
+        let popup = layui.popup
+        let $ = layui.jquery
+
+        table.render({
+            elem: '#message-list',
+            url: '/loganalysis/message/list',
+            method: 'get',
+            scrollX: true,
+//            page: {
+//                limit: 10
+//                , limits: [10, 30, 50, 100]
+//                , layout: ['count', 'first', 'prev', 'page', 'next', 'last', 'limit']
+//                , groups: 10
+//            },
+            cols: [[ //表头
+                {field: 'id', title: 'ID', fixed: 'left'}
+                , {field: 'content', title: '消息内容'}
+                , {field: 'from_id', title: '发起用户 ID'}
+                , {field: 'to_id', title: '目标用户 ID'}
+                , {field: 'type_id', title: '类型 ID'}
+                , {field: 'create_at', title: '创建时间'}
+                , {fixed: 'right', title: '操作', width: 60, toolbar: '#deleteBar'}
+            ]]
+        })
+        let clickFlag = false;
+        table.on('tool(m-list)', function (obj) {
+            let data = obj.data;
+            clickFlag = true
+
+            layer.confirm('确定删除该消息吗？', function (index) {
+                $.ajax({
+                    url: '/loganalysis/message/delete?id=' + data['id'],
+                    type: 'get',
+                    success: function (result) {
+                        if (result.success) {
+                            popup.success(result.msg, function () {
+                                obj.del();
+                                layer.close(index);
+                            })
+                        } else {
+                            popup.failure(result.msg, function () {
+                            })
+                        }
+                    }
+                })
+
+            });
+        });
+        table.on('row(m-list)', function (obj) {
+            if (clickFlag) {
+                clickFlag = false
+            }
+        })
+        $('#mine').addClass('layui-this')
+        $('#msg_manager').addClass('layui-this')
+        $('#data-manage').addClass('layui-nav-itemed')
+    })
+</script>
+</body>
+</html>

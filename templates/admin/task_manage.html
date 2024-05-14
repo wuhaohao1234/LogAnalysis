@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    {% include 'common/header_inc.html' %}
+    <style>
+        .layui-form {
+            width: 100% !important;
+        }
+    </style>
+</head>
+<body>
+<div class="layui-container">
+    {% include 'common/header_site.html' %}
+    <div class="layui-row">
+        <div class="layui-col-md2">
+            {% include 'admin/nav.html' %}
+        </div>
+        <div class="layui-col-md10">
+            <table class="layui-table" id="task-list" lay-filter="t-list" style="width: auto;">
+            </table>
+        </div>
+    </div>
+    {% include 'common/footer.html' %}
+</div>
+<script>
+    selectMineNav(1, 1, 'admin-nav');
+</script>
+<script>
+    layui.use(['table', 'jquery'], function () {
+        let table = layui.table
+        let $ = layui.jquery
+        table.render({
+            elem: '#task-list',
+            url: '/admin/task/list',
+            method: 'get',
+            scrollX: true,
+//            page: {
+//                limit: 10
+//                , limits: [10, 30, 50, 100]
+//                , layout: ['count', 'first', 'prev', 'page', 'next', 'last', 'limit']
+//                , groups: 10
+//            },
+            cols: [[ //表头
+                {field: 'id', title: 'ID', fixed: 'left'}
+                , {field: 'username', title: '用户名'}
+                , {field: 'url', title: '扫描地址'}
+                , {field: 'task_type', title: '类型'}
+                , {field: 'task_status', title: '状态'}
+                , {field: 'create_at', title: '创建时间'}
+                , {field: 'update_at', title: '完成时间'}
+            ]]
+        })
+        table.on('row(t-list)', function (obj) {
+            if (obj.data['task_status'] == '完成') {
+                location.href = '/scan_report?id=' + obj.data['id']
+            }
+        })
+        $('#data-manage').addClass('layui-nav-itemed')
+        $('#task-manage').addClass('layui-this')
+    })
+</script>
+</body>
+</html>

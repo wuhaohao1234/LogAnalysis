@@ -1,0 +1,23 @@
+<div class="layui-row layui-font-24 {{{ layui_theme }}}">
+    <div class="layui-col-md2 layui-padding-4">
+        <a href="/" id="logo"><i class="layui-icon layui-font-24" style="color: orange">&#xe6b2;</i>LogAnalysis</a>
+    </div>
+    <div class="layui-col-md8 layui-padding-4" style="text-align: center !important;">
+        {{{ site_info.title }}}
+    </div>
+
+</div>
+{% if user.is_admin %}
+    <div class="layui-row">
+        <div class="layui-col-md12 layui-margin-2"></div>
+    </div>
+{% endif　%}
+<style>
+    #logo {
+        color: white;
+    }
+    #logo:hover {
+        transform: scale(1.5, 1.5);
+        text-shadow: 1px 1px 2px orange;
+    }
+</style>

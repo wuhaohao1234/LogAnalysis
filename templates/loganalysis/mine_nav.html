@@ -1,0 +1,48 @@
+<ul class="layui-nav layui-nav-tree {{{ layui_theme }}}"  style="width: 150px;">
+    <li class="layui-fluid layui-padding-3">当前用户：{{{ user.username }}}</li>
+    <!-- 侧边导航: <ul class="layui-nav layui-nav-tree layui-nav-side"> -->
+    <li class="layui-nav-item mine-nav" id="setup">
+        <a href="javascript:;">设置</a>
+        <dl class="layui-nav-child">
+            <dd><a href="/loganalysis/mine" class="child" id="info">基本信息</a></dd>
+            <dd><a href="/loganalysis/change_password" class="child" id="update_password">修改密码</a></dd>
+        </dl>
+    </li>
+    <li class="layui-nav-item mine-nav" id="data-manage">
+        <a href="javascript:;">数据管理</a>
+        <dl class="layui-nav-child">
+            <dd><a href="/loganalysis/task/mine" class="child" id="task-manage">任务管理</a></dd>
+            <dd><a href="/loganalysis/message/mine" class="child" id="msg_manager">消息管理<span class="layui-badge layui-hide" id="mine-nav-badge"></span></a></dd>
+            <dd><a href="/loganalysis/log/mine" class="child" id="log_manager">日志管理</a></dd>
+        </dl>
+    </li>
+    <li class="layui-nav-item"><a href="javascript:;" id="menu-logout">登出</a></li>
+</ul>
+<script>
+    layui.use(['layer', 'jquery', 'popup', 'button'], function () {
+        let $ = layui.jquery;
+        let layer = layui.layer;
+        let button = layui.button;
+        let popup = layui.popup;
+        $('#menu-logout').on('click', function () {
+            $.ajax({
+                url: "/loganalysis/passport/logout",
+                type: "get",
+                dataType: 'json',
+                success: function (result) {
+                    console.log(result)
+                    if (result.success) {
+                        popup.success(result.msg, function () {
+                            location.href = "{{{ url_for('loganalysis.index.index') }}}";
+                        })
+                    } else {
+                        popup.failure(result.msg, function () {
+
+                        });
+                    }
+                }
+            });
+            return false;
+        })
+    })
+</script>

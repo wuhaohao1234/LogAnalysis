@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    {% include 'common/header_inc.html' %}
+</head>
+<body>
+<div class="layui-container">
+    {% include 'common/header_site.html' %}
+    <div class="layui-row">
+        <div class="layui-col-md2">
+            {% include 'admin/nav.html' %}
+        </div>
+        <div class="layui-col-md5">
+            <div class="layui-row">
+                <div class="layui-col-md12 layui-margin-2"></div>
+            </div>
+            <form class="layui-form" action="" style="width: 500px !important;" method="post">
+                <div class="layui-form-item">
+                    <label class="layui-form-label">网站标题</label>
+                    <div class="layui-input-block">
+                        <input type="text" name="title" value="{{{ site_info.title }}}"
+                               placeholder="请输入网站标题"
+                               autocomplete="off" class="layui-input">
+                    </div>
+                </div>
+                <div class="layui-form-item">
+                    <label class="layui-form-label">网站 URL</label>
+                    <div class="layui-input-block">
+                        <input type="text" name="url" value="{{{ site_info.url }}}"
+                               placeholder="请输入网站 URL"
+                               autocomplete="off" class="layui-input">
+                    </div>
+                </div>
+                <div class="layui-form-item">
+                    <label class="layui-form-label">网站关键词</label>
+                    <div class="layui-input-block">
+                        <input type="text" name="keywords" value="{{{ site_info.keywords }}}"
+                               placeholder="请输入网站 URL"
+                               autocomplete="off" class="layui-input">
+                    </div>
+                </div>
+                <div class="layui-form-item">
+                    <label class="layui-form-label">联系电话</label>
+                    <div class="layui-input-block">
+                        <input type="text" name="tel" value="{{{ site_info.tel }}}"
+                               placeholder="请输入联系电话"
+                               autocomplete="off" class="layui-input">
+                    </div>
+                </div>
+                <div class="layui-form-item">
+                    <label class="layui-form-label">管理员邮箱</label>
+                    <div class="layui-input-block">
+                        <input type="text" name="email" value="{{{ site_info.email }}}"
+                               placeholder="请输入管理员邮箱地址"
+                               autocomplete="off" class="layui-input">
+                    </div>
+                </div>
+                <div class="layui-form-item">
+                    <label class="layui-form-label">版权信息</label>
+                    <div class="layui-input-block">
+                        <input type="text" name="copyright" value="{{{ site_info.site_copyright }}}"
+                               placeholder="请输入版权信息"
+                               autocomplete="off" class="layui-input">
+                    </div>
+                </div>
+                <div class="layui-form-item">
+                    <label class="layui-form-label">网站简介</label>
+                    <div class="layui-input-block">
+                        <textarea name="description" placeholder="请输入网站简介" class="layui-textarea">{{{ site_info.description }}}</textarea>
+                    </div>
+                </div>
+                <div class="layui-form-item">
+                    <div class="layui-input-block">
+                        <button class="layui-btn" lay-submit="" lay-filter="formDemo"
+                                style="width: auto !important;">
+                            立即提交
+                        </button>
+                        <button type="reset" class="layui-btn  layui-btn-primary layui-bg-gray"
+                                style="width: auto !important;">重置
+                        </button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    {% include 'common/footer.html' %}
+</div>
+<script>
+    {#selectMineNav(0, 0, 'admin-nav');#}
+</script>
+<script>
+    layui.use(['form', 'button', 'popup', 'jquery', 'layer'], function () {
+        let form = layui.form;
+        let button = layui.button
+        let $ = layui.jquery
+        let popup = layui.popup
+        let layer = layui.layer
+        //监听提交
+        form.on('submit(formDemo)', function (data) {
+            let loader = layer.load();
+            let btn = button.load({elem: '.login'});
+            $.ajax({
+                url: '/admin/update_info',
+                data: data.field,
+                type: "post",
+                dataType: 'json',
+                success: function (result) {
+                    console.log('here --------------')
+                    layer.close(loader);
+                    btn.stop(function () {
+                        if (result.success) {
+                            popup.success(result.msg, function () {
+                                location.href = "{{{ url_for('admin.index.index') }}}";
+                            })
+                        } else {
+                            popup.failure(result.msg, function () {
+                            });
+                        }
+                    })
+                }
+            });
+
+
+            return false;
+        });
+    });
+</script>
+</body>
+</html>

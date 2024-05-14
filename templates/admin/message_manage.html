@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    {% include 'common/header_inc.html' %}
+    <style>
+        .layui-form {
+            width: 100% !important;
+        }
+    </style>
+</head>
+<body>
+<div class="layui-container">
+    {% include 'common/header_site.html' %}
+    <div class="layui-row">
+        <div class="layui-col-md2">
+            {% include 'admin/nav.html' %}
+        </div>
+        <div class="layui-col-md10">
+            <table class="layui-table" id="message-list" style="width: auto;">
+            </table>
+        </div>
+    </div>
+    {% include 'common/footer.html' %}
+</div>
+<script>
+    selectMineNav(1, 2, 'admin-nav');
+</script>
+<script>
+    layui.use(['table', 'jquery'], function () {
+        let table = layui.table
+        let $ = layui.jquery
+        table.render({
+            elem: '#message-list',
+            url: '/admin/message/list',
+            method: 'get',
+            scrollX: true,
+//            page: {
+//                limit: 10
+//                , limits: [10, 30, 50, 100]
+//                , layout: ['count', 'first', 'prev', 'page', 'next', 'last', 'limit']
+//                , groups: 10
+//            },
+            cols: [[ //表头
+                {field: 'id', title: 'ID', fixed: 'left'}
+                , {field: 'from_id', title: '来源 ID'}
+                , {field: 'to_id', title: '目标 ID'}
+                , {field: 'content', title: '内容'}
+                , {field: 'create_at', title: '创建时间'}
+            ]]
+        })
+        $('#data-manage').addClass('layui-nav-itemed')
+        $('#msg-manage').addClass('layui-this')
+    })
+</script>
+</body>
+</html>

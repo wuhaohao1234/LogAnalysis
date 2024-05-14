@@ -1,0 +1,63 @@
+<ul class="layui-nav {{{ layui_theme }}}">
+    <li class="layui-nav-item home-nav"><a href="/loganalysis" id="index">首页</a></li>
+    <li class="layui-nav-item home-nav" id="task">
+        <a href="/loganalysis/task">任务</a>
+    </li>
+    <li class="layui-nav-item home-nav" id="login"
+        style="display: {% if user.is_authenticated %}none{% else %}inline-block{% endif %};"><a
+            href="/loganalysis/passport/login">登录</a></li>
+    <li class="layui-nav-item home-nav" id="register"
+        style="display: {% if user.is_authenticated %}none{% else %}inline-block{% endif %};"><a
+            href="/loganalysis/register">注册</a></li>
+    <li class="layui-nav-item home-nav" id="mine"
+        style="display: {% if user.is_authenticated %}inline-block{% else %}none{% endif %};">
+        <a href="/loganalysis/mine" id="mime">
+            <img src="{% if user %} /{{{ user.avatar }}} {% endif %}" alt="Avatar" class="layui-nav-img">
+            <span class="layui-badge-dot layui-hide" id="nav-badge"></span>
+        </a>
+        <dl class="layui-nav-child" style="z-index: 10000;">
+            <dd><a href="/loganalysis/mine">查看/修改用户信息</a></dd>
+            <dd><a href="/loganalysis/change_password">修改密码</a></dd>
+            <hr>
+            <dd><a href="/loganalysis/task/mine">扫描任务</a></dd>
+            <dd><a href="/loganalysis/message/mine">消息<span class="layui-badge layui-hide" id="nav-msg-badge"></span></a>
+            </dd>
+            <dd><a href="/loganalysis/log/mine">日志</a></dd>
+            <dd><a href="javascript:;" id="nav-logout">登出</a></dd>
+        </dl>
+    </li>
+    <li class="layui-nav-item home-nav"><a href="/loganalysis/about" id="about">关于我们</a></li>
+</ul>
+<div class="layui-row">
+    <div class="layui-col-md12 layui-padding-2"></div>
+</div>
+<script>
+    layui.use(['layer', 'jquery', 'popup', 'button'], function () {
+        let $ = layui.jquery;
+        let layer = layui.layer;
+        let button = layui.button;
+        let popup = layui.popup;
+
+        $('#nav-logout').on('click', function () {
+            $.ajax({
+                url: "/loganalysis/passport/logout",
+                type: "get",
+                dataType: 'json',
+                success: function (result) {
+                    console.log(result)
+                    if (result.success) {
+                        popup.success(result.msg, function () {
+                            location.href = "{{{ url_for('loganalysis.index.index') }}}";
+                        })
+                    } else {
+                        popup.failure(result.msg, function () {
+
+                        });
+                    }
+                }
+            });
+            return false;
+        })
+    })
+</script>
+<script src="{{{ url_for('static', filename='system/js/common.js') }}}"></script>

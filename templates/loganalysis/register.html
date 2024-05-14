@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    {% include 'common/header_inc.html' %}
+    <link rel="stylesheet" href="{{{ url_for('static', filename='system/css/login.css') }}}"/>
+</head>
+<body>
+<div class="layui-container layui-bg-gray">
+    {% include 'common/header_site.html' %}
+    {% include 'loganalysis/nav.html' %}
+    <div class="layui-card" style="width: 350px; margin: 30px auto;">
+        <div class="layui-card-body">
+            <form class="layui-form" action="" lay-filter="registerForm" method="post">
+                <div class="layui-form-item">
+                    <input type="text" name="username" required lay-verify="required" placeholder="用户名:"
+                           autocomplete="off" class="layui-input">
+                </div>
+                <div class="layui-form-item">
+                    <input type="password" name="password" required lay-verify="required" placeholder="密码:"
+                           autocomplete="off" class="layui-input">
+                </div>
+                <div class="layui-form-item">
+                    <input type="password" name="confirm_password" required lay-verify="required"
+                           placeholder="验证密码:"
+                           autocomplete="off" class="layui-input">
+                </div>
+                <div class="layui-form-item">
+                    <input placeholder="验证码 : " name="captcha" hover class="code layui-input layui-input-inline"/>
+                    <img src="{{{ url_for('common.get_captcha.get_page_captcha') }}}" class="codeImage" id="captchaImage"/>
+                </div>
+                <div class="layui-form-item">
+                    <button class="layui-btn" lay-submit lay-filter="submitForm" style="width: 100% !important;">登录
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+    <div class="layui-row layui-margin-5 layui-bg-gray">
+        <br>
+    </div>
+</div>
+{% include 'common/footer.html' %}
+<script>
+    layui.use(['form', 'jquery', 'layer', 'button', 'popup'], function () {
+        let form = layui.form;
+        let $ = layui.jquery;
+        let layer = layui.layer;
+        let button = layui.button;
+        let popup = layui.popup;
+        let captchaPath = "{{{ url_for('common.get_captcha.get_page_captcha') }}}";
+
+        /**
+         * 刷新验证码函数
+         */
+        const refreshCaptchaImage = (function () {
+            let captchaImage = document.getElementById("captchaImage")
+            return function () {
+                captchaImage.src = captchaPath + "?" + Math.random()
+            }
+        })()
+
+        /**
+         * 立即刷新验证码并且每隔 30秒 刷新
+         */
+        const initCaptchaImageTimer = (function () {
+            let captchaImageTimer = null
+            return function () {
+                clearInterval(captchaImageTimer)
+                captchaImageTimer = setInterval(function () {
+                    refreshCaptchaImage()
+                }, 30 * 1000);
+                refreshCaptchaImage()
+            }
+        })()
+        initCaptchaImageTimer()
+
+        form.on('submit(submitForm)', function (data) {
+            let loader = layer.load();
+            let btn = button.load({elem: '.login'});
+            $.ajax({
+                data: data.field,
+                type: "post",
+                dataType: 'json',
+                contentType: 'application/x-www-form-urlencoded',
+                success: function (result) {
+                    layer.close(loader);
+                    btn.stop(function () {
+                        if (result.success) {
+                            popup.success(result.msg, function () {
+                                location.href = "{{{ url_for('loganalysis.passport.login') }}}";
+                            })
+                        } else {
+                            popup.failure(result.msg, function () {
+                                initCaptchaImageTimer()
+                            });
+                        }
+                    })
+                }
+            });
+            return false;
+        });
+        $("#captchaImage").click(function () {
+            console.log('click')
+            initCaptchaImageTimer()
+        });
+        $('#register').addClass('layui-this')
+    })
+</script>
+</body>
+</html>

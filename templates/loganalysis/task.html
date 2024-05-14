@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    {% include 'common/header_inc.html' %}
+    <style>
+        .layui-form {
+            width: 100% !important;
+        }
+    </style>
+</head>
+<body>
+<div class="layui-container layui-bg-gray">
+    {% include 'common/header_site.html' %}
+    {% include 'loganalysis/nav.html' %}
+    <div class="layui-row layui-margin-2">
+        <div class="layui-col-md3">
+            <div class="layui-row" style="text-align: center;">&nbsp;</div>
+        </div>
+        <div class="layui-col-md9">
+            <div class="layui-row layui-font-14" style="text-align: center;">正在进行的任务</div>
+        </div>
+    </div>
+    <div class="layui-row">
+        <div class="layui-col-md3" style="margin-right: 30px;">
+            <form class="layui-form" action="/add_task" method="post" style="margin-top: 20px">
+                <div class="layui-form-item" style="padding-left: 35px;">
+                        <input type="text" name="url" required lay-verify="required"
+                               placeholder="请输入日志探针地址"
+                               autocomplete="off" class="layui-input">
+                </div>
+                <div class="layui-form-item">
+                    <label class="layui-form-label">任务属性</label>
+                    <div class="layui-input-block">
+                        <input type="radio" name="task_type_id" value="1" title="公开" checked>
+                        <input type="radio" name="task_type_id" value="2" title="私有">
+                    </div>
+                </div>
+                <div class="layui-form-item">
+                    <div class="layui-input-block">
+                        <button class="layui-btn" lay-submit="" lay-filter="submitForm" style="width: auto !important;">
+                            开始扫描
+                        </button>
+                        <button type="reset" class="layui-btn  layui-btn-primary layui-bg-gray"
+                                style="width: auto !important;">重置
+                        </button>
+                    </div>
+                </div>
+            </form>
+        </div>
+        <div class="layui-col-md8">
+            <table class="layui-table" id="task-list" style="width: auto;">
+            </table>
+        </div>
+    </div>
+    {% include 'common/footer.html' %}
+</div>
+<script>
+    layui.use(['form', 'button', 'jquery', 'popup', 'table'], function () {
+        let form = layui.form;
+        let button = layui.button
+        let $ = layui.jquery
+        let popup = layui.popup
+        let table = layui.table
+
+        // 定义一个方法用来刷新表格
+        function refreshTable() {
+            table.reload('task-list', {
+                url: '/loganalysis/task/list', // 更新数据接口
+                method: 'get'
+                // 如果需要传递额外参数，可以通过 where 属性
+                // ,where: {field1: 'value1', field2: 'value2'}
+            });
+        }
+
+        //监听提交
+        form.on('submit(submitForm)', function (data) {
+            let loader = layer.load();
+            let btn = button.load({elem: '.login'});
+            $.ajax({
+                url: '/loganalysis/task/add',
+                data: data.field,
+                type: "post",
+                contentType: 'application/x-www-form-urlencoded; charset=UTF-8',
+                dataType: 'json',
+                success: function (result) {
+                    layer.close(loader);
+                    btn.stop(function () {
+                        if (result.success) {
+                            popup.success(result.msg, function () {
+                                refreshTable()
+                            })
+                        } else {
+                        }
+                        return false
+                    })
+                }
+            });
+            return false;
+        });
+    });
+</script>
+<script>
+    layui.use(['table', 'jquery'], function () {
+        let table = layui.table
+        let $ = layui.jquery
+        table.render({
+            elem: '#task-list',
+            url: '/loganalysis/task/list',
+            method: 'get',
+            scrollX: true,
+//            page: {
+//                limit: 10
+//                , limits: [10, 30, 50, 100]
+//                , layout: ['count', 'first', 'prev', 'page', 'next', 'last', 'limit']
+//                , groups: 10
+//            },
+            cols: [[ //表头
+                {field: 'id', title: 'ID', fixed: 'left'}
+                , {field: 'username', title: '用户名'}
+                , {field: 'url', title: '扫描地址'}
+                , {field: 'task_type', title: '类型'}
+                , {field: 'create_at', title: '创建时间'}
+            ]]
+        })
+        $('#task').addClass('layui-this')
+    })
+</script>
+</body>
+</html>

@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    {% include 'common/header_inc.html' %}
+    <style>
+        .layui-form {
+            width: 100% !important;
+        }
+    </style>
+</head>
+<body>
+<div class="layui-container layui-bg-gray">
+    {% include 'common/header_site.html' %}
+    {% include 'loganalysis/nav.html' %}
+    <div class="layui-row">
+        <div class="layui-col-md2">
+            {% include 'loganalysis/mine_nav.html' %}
+        </div>
+        <div class="layui-col-md10">
+            <table class="layui-table" id="task-list" lay-filter="t-list" style="width: auto;">
+            </table>
+        </div>
+    </div>
+    <script type="text/html" id="deleteBar">
+        <a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="del">删除</a>
+    </script>
+    {% include 'common/footer.html' %}
+</div>
+<script>
+    layui.use(['table', 'popup', 'jquery'], function () {
+        let table = layui.table
+        let popup = layui.popup
+        let $ = layui.jquery
+
+        table.render({
+            elem: '#task-list',
+            url: '/loganalysis/task/list',
+            method: 'get',
+            scrollX: true,
+//            page: {
+//                limit: 10
+//                , limits: [10, 30, 50, 100]
+//                , layout: ['count', 'first', 'prev', 'page', 'next', 'last', 'limit']
+//                , groups: 10
+//            },
+            cols: [[ //表头
+                {field: 'id', title: 'ID', fixed: 'left'}
+                , {field: 'url', title: '扫描地址'}
+                , {field: 'task_type', title: '类型'}
+                , {field: 'task_status', title: '状态'}
+                , {field: 'create_at', title: '创建时间'}
+                , {fixed: 'right', title: '操作', width: 60, toolbar: '#deleteBar'}
+            ]]
+        })
+        let clickFlag = false;
+        table.on('tool(t-list)', function (obj) {
+            let data = obj.data;
+            clickFlag = true
+
+            layer.confirm('确定删除该任务吗？', function (index) {
+                $.ajax({
+                    url: '/loganalysis/task/delete?id=' + data['id'],
+                    type: 'get',
+                    success: function (result) {
+                        if (result.success) {
+                            popup.success(result.msg, function () {
+                                obj.del();
+                                layer.close(index);
+                            })
+                        } else {
+                            popup.failure(result.msg, function () {
+                            })
+                        }
+                    }
+                })
+
+            });
+        });
+        table.on('row(t-list)', function (obj) {
+            if (clickFlag) {
+                clickFlag = false
+                return
+            }
+            if (obj.data['task_status'] == '完成') {
+                location.href = '/report?task_id=' + obj.data['id']
+            }
+        })
+        $('#mine').addClass('layui-this')
+        $('#task-manage').addClass('layui-this')
+        $('#data-manage').addClass('layui-nav-itemed')
+    })
+</script>
+</body>
+</html>

@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    {% include 'common/header_inc.html' %}
+    <style>
+        .layui-form {
+            width: 100% !important;
+        }
+    </style>
+</head>
+<body>
+<div class="layui-container layui-bg-gray">
+    {% include 'common/header_site.html' %}
+    {% include 'loganalysis/nav.html' %}
+    <div class="layui-row">
+        <div class="layui-col-md2">
+            {% include 'loganalysis/mine_nav.html' %}
+        </div>
+        <div class="layui-col-md10">
+            <table class="layui-table" id="log-list" style="width: auto;">
+            </table>
+        </div>
+    </div>
+    {% include 'common/footer.html' %}
+</div>
+<script>
+    layui.use(['table', 'jquery'], function () {
+        let table = layui.table
+        let $ = layui.jquery
+        table.render({
+            elem: '#log-list',
+            url: '/loganalysis/log/login_log',
+            method: 'get',
+            scrollX: true,
+//            page: {
+//                limit: 10
+//                , limits: [10, 30, 50, 100]
+//                , layout: ['count', 'first', 'prev', 'page', 'next', 'last', 'limit']
+//                , groups: 10
+//            },
+            cols: [[ //表头
+                {field: 'id', title: 'ID', fixed: 'left'}
+                , {field: 'url', title: 'URL'}
+                , {field: 'ip', title: 'IP'}
+                , {
+                    field: 'success', title: '是否成功', templet: function (d) {
+                        return d.success ? '成功' : '失败'
+                    }
+                }
+                , {field: 'user_agent', title: '用户代理'}
+                , {field: 'create_at', title: '登录时间'}
+            ]]
+        })
+        $('#mine').addClass('layui-this')
+        $('#log_manager').addClass('layui-this')
+        $('#data-manage').addClass('layui-nav-itemed')
+    })
+</script>
+</body>
+</html>

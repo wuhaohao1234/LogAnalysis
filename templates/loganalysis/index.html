@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    {% include 'common/header_inc.html' %}
+    <style>
+        .layui-form {
+            width: 100% !important;
+        }
+    </style>
+</head>
+<body>
+<div class="layui-container layui-bg-gray">
+    {% include 'common/header_site.html' %}
+    {% include 'loganalysis/nav.html' %}
+    <div class="layui-row layui-margin-2">
+        <div class="layui-col-md9">
+            <div class="layui-row layui-font-20">最新发起扫描任务</div>
+        </div>
+        <div class="layui-col-md3">
+            <div class="layui-row layui-font-14" style="padding-left: 20px;">最近登录用户</div>
+        </div>
+    </div>
+    <div class="layui-row">
+        <div class="layui-col-md9" style="padding-right: 20px;">
+            <table class="layui-table" id="newstart-list" lay-filter="start-list" style="width: auto;"></table>
+        </div>
+        <div class="layui-col-md3">
+            <table class="layui-table" id="login-list" style="width: auto;"></table>
+        </div>
+    </div>
+    <div class="layui-row layui-margin-2">
+        <div class="layui-col-md9">
+            <div class="layui-row layui-font-20">最新完成扫描任务</div>
+        </div>
+        <div class="layui-col-md3">
+            <div class="layui-row layui-font-14" style="padding-left: 20px;">最近注册用户</div>
+        </div>
+    </div>
+    <div class="layui-row">
+        <div class="layui-col-md9" style="padding-right: 20px;">
+            <table class="layui-table" id="newdone-list" lay-filter="done-list" style="width: auto;"></table>
+        </div>
+        <div class="layui-col-md3">
+            <table class="layui-table" id="register-list" style="width: auto;"></table>
+        </div>
+    </div>
+    {% include 'common/footer.html' %}
+</div>
+<script>
+    layui.use(['table', 'jquery'], function () {
+        let table = layui.table
+        let $ = layui.jquery
+        table.render({
+            elem: '#newstart-list',
+            url: '/loganalysis/task/newstart_list',
+            method: 'get',
+            skin: 'line',
+            scrollX: true,
+//            page: {
+//                limit: 10
+//                , limits: [10, 30, 50, 100]
+//                , layout: ['count', 'first', 'prev', 'page', 'next', 'last', 'limit']
+//                , groups: 10
+//            },
+            cols: [[ //表头
+                {field: 'username', title: '用户名'}
+                , {field: 'url', title: '扫描地址'}
+                , {field: 'task_status', title: '状态'}
+                , {field: 'create_at', title: '创建时间'}
+            ]]
+        })
+        table.render({
+            elem: '#newdone-list',
+            url: '/loganalysis/task/newdone_list',
+            method: 'get',
+            skin: 'line',
+            scrollX: true,
+//            page: {
+//                limit: 10
+//                , limits: [10, 30, 50, 100]
+//                , layout: ['count', 'first', 'prev', 'page', 'next', 'last', 'limit']
+//                , groups: 10
+//            },
+            cols: [[ //表头
+                {field: 'id', title: 'ID', hide: true}
+                , {field: 'username', title: '用户名'}
+                , {field: 'url', title: '扫描地址'}
+                , {field: 'task_status', title: '状态'}
+                , {field: 'update_at', title: '完成时间'}
+            ]]
+        })
+        table.render({
+            elem: '#login-list',
+            url: '/loganalysis/log/new_login_list',
+            method: 'get',
+            scrollX: true,
+            skin: 'nob',
+//            page: {
+//                limit: 10
+//                , limits: [10, 30, 50, 100]
+//                , layout: ['count', 'first', 'prev', 'page', 'next', 'last', 'limit']
+//                , groups: 10
+//            },
+            cols: [[ //表头
+                {field: 'username', title: '昵称'}
+                , {field: 'create_at', title: '登录时间'}
+            ]]
+        })
+        table.render({
+            elem: '#register-list',
+            url: '/loganalysis/new_register_list',
+            method: 'get',
+            scrollX: true,
+            skin: 'nob',
+//            page: {
+//                limit: 10
+//                , limits: [10, 30, 50, 100]
+//                , layout: ['count', 'first', 'prev', 'page', 'next', 'last', 'limit']
+//                , groups: 10
+//            },
+            cols: [[ //表头
+                {field: 'username', title: '昵称'}
+                , {field: 'create_at', title: '注册时间'}
+            ]]
+        })
+        table.on('row(done-list)', function (obj) {
+            location.href = '/report?task_id=' + obj.data['id']
+        })
+        table.on('row(start-list)', function (obj) {
+            if (obj.data['task_status'] == '完成') {
+                location.href = '/report?task_id=' + obj.data['id']
+            }
+        })
+        $('#index').addClass('layui-this')
+    })
+</script>
+</body>
+</html>
